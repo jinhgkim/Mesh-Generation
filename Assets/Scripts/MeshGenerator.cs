@@ -68,7 +68,7 @@ public class MeshGenerator : MonoBehaviour
 
                 yield return new WaitForSeconds(.1f);
             }
-            //vert++;
+            vert++;
         }
     }
 
