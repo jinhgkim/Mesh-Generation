@@ -1,12 +1,15 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]  
+[RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
 {
     Mesh mesh;
     Vector3[] vertices;
     int[] triangles;
+
+    public int xSize = 20;
+    public int zSize = 20;
 
     // Start is called before the first frame update
     void Start()
@@ -30,19 +33,25 @@ public class MeshGenerator : MonoBehaviour
 
     private void CreateShape()
     {
-        vertices = new Vector3[]
-        {
-            new Vector3(0,0,0),
-            new Vector3(0,0,1),
-            new Vector3(1,0,0),
-            new Vector3(1,0,1),
-        };
+        vertices = new Vector3[(xSize + 1) * (zSize + 1)];
 
-        triangles = new int[]
+        for (int i = 0, z = 0; z < zSize + 1; z++)
         {
-            0,1,2,
-            1,3,2,
+            for (int x = 0; x < xSize + 1; x++)
+            {
+                vertices[i] = new Vector3(x, 0, z);
+                i++;
+            }
+        }
+    }
 
-        };
+    private void OnDrawGizmos()
+    {
+        if (vertices == null)
+            return;
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            Gizmos.DrawSphere(vertices[i], .1f);
+        }
     }
 }
