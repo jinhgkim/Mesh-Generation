@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
@@ -17,10 +19,12 @@ public class MeshGenerator : MonoBehaviour
         mesh = new();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        CreateShape();
+        StartCoroutine(CreateShape());
+    }
+    private void Update()
+    {
         UpdateMesh();
     }
-
     private void UpdateMesh()
     {
         mesh.Clear();
@@ -31,7 +35,7 @@ public class MeshGenerator : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    private void CreateShape()
+    private IEnumerator CreateShape()
     {
         vertices = new Vector3[(xSize + 1) * (zSize + 1)];
 
@@ -42,6 +46,29 @@ public class MeshGenerator : MonoBehaviour
                 vertices[i] = new Vector3(x, 0, z);
                 i++;
             }
+        }
+
+        triangles = new int[6 * xSize * zSize];
+        int tries = 0;
+        int vert = 0;
+        for (int z = 0; z < zSize; z++)
+        {
+            for (int x = 0; x < xSize; x++)
+            {
+                // Draw one quad
+                triangles[0 + tries] = vert + 0;
+                triangles[1 + tries] = vert + xSize + 1;
+                triangles[2 + tries] = vert + 1;
+                triangles[3 + tries] = vert + 1;
+                triangles[4 + tries] = vert + xSize + 1;
+                triangles[5 + tries] = vert + xSize + 2;
+
+                tries += 6;
+                vert++;
+
+                yield return new WaitForSeconds(.1f);
+            }
+            //vert++;
         }
     }
 
