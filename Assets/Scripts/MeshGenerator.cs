@@ -19,11 +19,9 @@ public class MeshGenerator : MonoBehaviour
         mesh = new();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        StartCoroutine(CreateShape());
-    }
-    private void Update()
-    {
+        CreateShape();
         UpdateMesh();
+
     }
     private void UpdateMesh()
     {
@@ -35,7 +33,7 @@ public class MeshGenerator : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    private IEnumerator CreateShape()
+    private void CreateShape()
     {
         vertices = new Vector3[(xSize + 1) * (zSize + 1)];
 
@@ -43,7 +41,8 @@ public class MeshGenerator : MonoBehaviour
         {
             for (int x = 0; x < xSize + 1; x++)
             {
-                vertices[i] = new Vector3(x, 0, z);
+                float y = Mathf.PerlinNoise(x * .3f, z * .3f) * 2f;
+                vertices[i] = new Vector3(x, y, z);
                 i++;
             }
         }
@@ -65,8 +64,6 @@ public class MeshGenerator : MonoBehaviour
 
                 tries += 6;
                 vert++;
-
-                yield return new WaitForSeconds(.1f);
             }
             vert++;
         }
