@@ -18,6 +18,23 @@ public class Water : MonoBehaviour
         CreateWater();
         UpdateMesh();
     }
+
+    private void Update()
+    {
+        if (vertices != null)
+        {
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 v = vertices[i];
+                v.y = Mathf.Sin(0.5f * v.x + Time.time) * 0.5f;
+                vertices[i] = v;
+            }
+
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+        }
+    }
+
     private void UpdateMesh()
     {
         mesh.Clear();
