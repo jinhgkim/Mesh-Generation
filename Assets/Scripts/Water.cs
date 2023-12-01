@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Water : MonoBehaviour
@@ -9,9 +10,17 @@ public class Water : MonoBehaviour
     public int xSize = 20;
     public int zSize = 20;
 
+    [SerializeField] float amplitude = 1.0f;
+    [SerializeField] float angularFrequency = 1.0f;
+    //[SerializeField] float waveLength = 1.0f;
+    [SerializeField] float phaseConstant = .0f;
+    [SerializeField] float waveNumber_k = 1.0f;
+
     // Start is called before the first frame update
     void Start()
     {
+        //waveNumber_k = (float)(2 * Math.PI / waveLength);
+
         mesh = new();
         GetComponent<MeshFilter>().mesh = mesh;
 
@@ -26,7 +35,7 @@ public class Water : MonoBehaviour
             for (int i = 0; i < vertices.Length; i++)
             {
                 Vector3 v = vertices[i];
-                v.y = Mathf.Sin(0.5f * v.x + Time.time) * 0.5f;
+                v.y = amplitude * Mathf.Sin(waveNumber_k * v.x + angularFrequency * Time.time + phaseConstant);
                 vertices[i] = v;
             }
 
