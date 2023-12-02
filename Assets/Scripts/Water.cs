@@ -10,22 +10,37 @@ public class Water : MonoBehaviour
     public int xSize = 20;
     public int zSize = 20;
 
-    [SerializeField] float amplitude = 1.0f;
-    [SerializeField] float angularFrequency = 1.0f;
-    //[SerializeField] float waveLength = 1.0f;
-    [SerializeField] float phaseConstant = .0f;
-    [SerializeField] float waveNumber_k = 1.0f;
+    Wave w;
+    [SerializeField] float amplitude = .5f;
+    [SerializeField] float waveLength = 2 * (float)Math.PI;
+    [SerializeField] float frequency = .5f;
+
+    struct Wave
+    {
+        public float amplitude;
+        public float frequency;
+        public float phase;
+        public float k_waveNumber;
+
+        public Wave(float amplitude, float waveLength, float speed, float phase = .0f)
+        {
+            this.amplitude = amplitude;
+            this.k_waveNumber = 2 * (float)Math.PI / waveLength;
+            this.frequency = 2 * (float)Math.PI * speed;
+            this.phase = phase;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        //waveNumber_k = (float)(2 * Math.PI / waveLength);
-
         mesh = new();
         GetComponent<MeshFilter>().mesh = mesh;
 
         CreateWater();
         UpdateMesh();
+
+        w = new Wave(amplitude, waveLength, frequency);
     }
 
     private void Update()
@@ -35,7 +50,7 @@ public class Water : MonoBehaviour
             for (int i = 0; i < vertices.Length; i++)
             {
                 Vector3 v = vertices[i];
-                v.y = amplitude * Mathf.Sin(waveNumber_k * v.x + angularFrequency * Time.time + phaseConstant);
+                v.y = w.amplitude * Mathf.Sin(w.k_waveNumber * v.x + w.frequency * Time.time + w.phase);
                 vertices[i] = v;
             }
 
