@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 Shader "Unlit/Water"
 {
     Properties
@@ -22,14 +24,12 @@ Shader "Unlit/Water"
             {
                 float4 vertex : POSITION;
                 float3 normal : NORMAL;
-                //float2 uv : TEXCOORD0;
             };
 
             struct v2f
             {
-                //float2 uv : TEXCOORD0;
-                half3 worldNormal : TEXCOORD0;
-                float4 vertex : SV_POSITION;
+                half3 worldRefl : TEXCOORD0;
+                float4 pos : SV_POSITION;
             };
 
             sampler2D _MainTex;
@@ -39,20 +39,24 @@ Shader "Unlit/Water"
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.worldNormal = UnityObjectToWorldNormal(v.normal);
-                //o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.pos = UnityObjectToClipPos(v.vertex);
+                float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+                float3 worldViewDir = normalize(UnityWorldSpaceViewDir(worldPos));
+                float3 worldNormal = UnityObjectToWorldNormal(v.normal); 
+                o.worldRefl = reflect(-worldViewDir, worldNormal);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
+                 // sample the default reflection cubemap, using the reflection vector
+                half4 skyData = UNITY_SAMPLE_TEXCUBE(unity_SpecCube0, i.worldRefl);
+                // decode cubemap data into actual color
+                half3 skyColor = DecodeHDR(skyData, unity_SpecCube0_HDR);
+                // output it!
                 fixed4 c = 0;
-                c.rgb = i.worldNormal * 0.5 + 0.5;
+                c.rgb = skyColor;
                 return c;
-                //// sample the texture
-                //fixed4 col = tex2D(_MainTex, i.uv) * _WaterTex;
-                //return col;
             }
             ENDCG
         }
